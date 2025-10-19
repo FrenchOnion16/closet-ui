@@ -4,7 +4,10 @@
 .card h1{margin:0 0 18px;font-size:20px;font-weight:600}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
-.field input[type=email],.field input[type=password]{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:inherit;font-size:15px}
+.field input, .field select {width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:inherit;font-size:15px}
+
+/* Error state for inputs */
+.input-error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,0.08)}
 .password-row{display:flex;gap:8px;align-items:center}
 .password-row input{flex:1}
 #toggle-password{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;cursor:pointer}
