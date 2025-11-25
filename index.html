@@ -13,8 +13,8 @@
 
       <form id="login-form" novalidate>
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required>
+          <label for="email">Email or username</label>
+          <input id="email" name="email" type="text" inputmode="text" autocomplete="username email" placeholder="you@example.com or yourusername" required>
           <p class="error" id="email-error" aria-live="polite"></p>
         </div>
 
@@ -39,12 +39,9 @@
 
         <div class="result" id="result" aria-live="polite"></div>
 
-  <div class="hint">Demo credentials: <strong>user@example.com</strong> / <strong>password123</strong></div>
   <p class="signup">Don't have an account? <a href="signup.html">Sign up</a></p>
       </form>
     </section>
-
-    <footer class="attribution">Closet UI — demo login</footer>
   </main>
 
   <script src="script.js" defer></script>

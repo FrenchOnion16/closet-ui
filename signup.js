@@ -23,7 +23,16 @@ function showError(inputEl, msg) {
 
 function validate() {
   let ok = true;
-  if (!usernameEl.value.trim()) { showError(usernameEl, 'Username is required'); ok = false } else { showError(usernameEl, '') }
+  const usernameVal = usernameEl.value.trim();
+  if (!usernameVal) {
+    showError(usernameEl, 'Username is required');
+    ok = false;
+  } else if (usernameVal.length < 3 || usernameVal.length > 20) {
+    showError(usernameEl, 'Username must be between 3 and 20 characters');
+    ok = false;
+  } else {
+    showError(usernameEl, '');
+  }
   if (!emailEl.value) { showError(emailEl, 'Email is required'); ok = false } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailEl.value)) { showError(emailEl, 'Enter a valid email'); ok = false } else { showError(emailEl, '') }
 
   const ageVal = Number(ageEl.value);
@@ -79,32 +88,38 @@ form.addEventListener('submit', (e) => {
       return;
     }
 
-    // Handle validation errors (commonly 422 Unprocessable Entity)
     let payload;
     try { payload = await res.json(); } catch (e) { payload = null }
-    if (res.status === 422 && payload && payload.errors) {
-      // payload.errors expected format: { field: [msgs] }
-      Object.entries(payload.errors).forEach(([field, msgs]) => {
-        const el = document.getElementById(field + '-error');
-        if (el) {
-          // find the input/select by name or id
-          const input = document.getElementById(field) || document.querySelector(`[name="${field}"]`);
-          if (input) showError(input, msgs.join(', '));
+    if (res.status === 422 && payload && Array.isArray(payload.errors)) {
+      const rawMessages = payload.errors.map(m => String(m).trim()).filter(Boolean);
+      rawMessages.forEach(msg => {
+        const fieldName = msg.split(/\s+/)[0].toLowerCase();
+        let targetEl = null;
+        switch (fieldName) {
+          case 'username': targetEl = usernameEl; break;
+          case 'email': targetEl = emailEl; break;
+          case 'password': targetEl = passwordEl; break;
+          case 'age': targetEl = ageEl; break;
+          case 'gender': targetEl = genderEl; break;
+          default: targetEl = null;
+        }
+        if (targetEl) {
+          showError(targetEl, msg);
         }
       });
-      resultEl.textContent = 'Please fix the errors above';
+      const unique = [...new Set(rawMessages)];
+        // Escape < & to avoid HTML injection, then build list items
+        const listHtml = '<ul class="error-list" style="margin:8px 0 0;padding-left:20px;color:var(--danger);">' +
+          unique.map(m => '<li>' + m.replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;') + '</li>').join('') + '</ul>';
+        resultEl.innerHTML = listHtml;
       resultEl.style.color = 'var(--danger)';
       return;
     }
-
-    resultEl.textContent = 'Server error — saving locally as fallback';
-    resultEl.style.color = 'var(--muted)';
-    try { localStorage.setItem('demoAccount', JSON.stringify(account)); } catch (e) { /* ignore */ }
   }).catch((err) => {
     submitBtn.disabled = false;
-    resultEl.textContent = 'Network error — saving locally as fallback';
+    resultEl.textContent = 'Network error';
     resultEl.style.color = 'var(--muted)';
-    try { localStorage.setItem('demoAccount', JSON.stringify(account)); } catch (e) { /* ignore */ }
+    try { localStorage.setItem('makeAccount', JSON.stringify(account)); } catch (e) { /* ignore */ }
   });
 });
 
